@@ -65,19 +65,26 @@ class ChatCompletionResponse(BaseModel):
 
 # Formatter to convert messages to Ollama prompt format
 def format_messages(messages: List[Message]) -> str:
-    formatted_prompt = ""
-    for msg in messages:
-        role = msg.role
-        if role == "system":
-            formatted_prompt += f"<|system|>\n{msg.content}</s>\n"
-        elif role == "user":
-            formatted_prompt += f"<|user|>\n{msg.content}</s>\n"
-        elif role == "assistant":
-            formatted_prompt += f"<|assistant|>\n{msg.content}</s>\n"
+    """
+    Format messages according to the chat template expected by Mistral models.
+    This may need to be adjusted based on the specific format your model expects.
+    """
+    # Create a single string prompt that Ollama can process
+    formatted_messages = []
     
-    # Add final assistant prompt
-    formatted_prompt += "<|assistant|>\n"
-    return formatted_prompt
+    for msg in messages:
+        if msg.role == "system":
+            formatted_messages.append(f"<|im_start|>system\n{msg.content}<|im_end|>")
+        elif msg.role == "user":
+            formatted_messages.append(f"<|im_start|>user\n{msg.content}<|im_end|>")
+        elif msg.role == "assistant":
+            formatted_messages.append(f"<|im_start|>assistant\n{msg.content}<|im_end|>")
+    
+    # Add the final assistant tag to prompt the model to generate a response
+    formatted_messages.append("<|im_start|>assistant\n")
+    
+    # Join all messages with newlines
+    return "\n".join(formatted_messages)
 
 # Count tokens (very approximate)
 def count_tokens(text: str) -> int:

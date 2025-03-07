@@ -57,7 +57,9 @@ curl -X POST \
 
 ### OpenAI-Compatible API
 
-The endpoint also exposes an OpenAI-compatible API that can be used with any OpenAI client library:
+The endpoint also exposes an OpenAI-compatible API that can be used with any OpenAI client library.
+
+#### When running locally:
 
 ```bash
 # List models
@@ -76,13 +78,40 @@ curl -X POST \
   }'
 ```
 
+#### When deployed on RunPod:
+
+```bash
+# Replace YOUR_ENDPOINT_ID with your RunPod endpoint ID
+# List models
+curl https://YOUR_ENDPOINT_ID-8000.proxy.runpod.net/v1/models
+
+# Create a chat completion
+curl -X POST \
+  https://YOUR_ENDPOINT_ID-8000.proxy.runpod.net/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "eko-mistral",
+    "messages": [
+      {"role": "system", "content": "You are a helpful AI assistant."},
+      {"role": "user", "content": "What is climate change?"}
+    ]
+  }'
+```
+
 #### Using with OpenAI Python Client
 
 ```python
 from openai import OpenAI
 
+# For local testing
+# client = OpenAI(
+#     base_url="http://localhost:8000/v1/",
+#     api_key="not-needed"  # API key is not checked but required by the client
+# )
+
+# For RunPod deployment
 client = OpenAI(
-    base_url="http://localhost:8000/v1/",  # Replace with your RunPod URL
+    base_url="https://YOUR_ENDPOINT_ID-8000.proxy.runpod.net/v1/",  # Replace YOUR_ENDPOINT_ID with your RunPod endpoint ID
     api_key="not-needed"  # API key is not checked but required by the client
 )
 

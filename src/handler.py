@@ -17,12 +17,18 @@ def handler(event):
     """RunPod handler function"""
     # Check if this is an OpenAI API request
     if event.get("path", "").startswith("/v1/"):
-        # This is handled by the FastAPI server running on port 8000
-        # Just return a message indicating where the OpenAI API is available
+        # When running in RunPod, the FastAPI server is on the same host
+        # Just return a message indicating the OpenAI API is available directly
+        endpoint_id = os.environ.get("RUNPOD_ENDPOINT_ID", "")
+        if endpoint_id:
+            base_url = f"https://{endpoint_id}-8000.proxy.runpod.net"
+        else:
+            base_url = "http://localhost:8000"
+            
         return {
             "output": {
-                "message": "OpenAI compatible API is available at http://localhost:8000/v1/",
-                "docs": "OpenAI API documentation at http://localhost:8000/docs"
+                "message": f"OpenAI compatible API is available at {base_url}/v1/",
+                "docs": f"OpenAI API documentation at {base_url}/docs"
             }
         }
     
