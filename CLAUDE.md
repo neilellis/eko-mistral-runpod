@@ -2,8 +2,9 @@
 
 ## Commands
 - **Build Docker**: `docker build --build-arg HF_TOKEN=your_huggingface_token -t eko-mistral-runpod:local .`
-- **Run Docker**: `docker run -p 8000:8000 eko-mistral-runpod:local`
-- **Test Endpoint**: `python test.py --url http://localhost:8000/run --prompt "Your prompt"`
+- **Run Docker**: `docker run -p 8000:8000 -p 8080:8080 eko-mistral-runpod:local`
+- **Test Standard API**: `python test.py --url http://localhost:8080/run --prompt "Your prompt"`
+- **Test OpenAI API**: `python test_openai.py --url http://localhost:8000 --prompt "Your prompt"`
 - **Lint**: `flake8 src/ test.py`
 - **Type Check**: `mypy src/ test.py`
 

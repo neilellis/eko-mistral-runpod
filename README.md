@@ -40,6 +40,8 @@ docker push your-dockerhub-username/eko-mistral-runpod:latest
 
 ## Usage
 
+### Standard RunPod API
+
 Once deployed, you can send requests to your RunPod endpoint:
 
 ```bash
@@ -53,6 +55,48 @@ curl -X POST \
   }'
 ```
 
+### OpenAI-Compatible API
+
+The endpoint also exposes an OpenAI-compatible API that can be used with any OpenAI client library:
+
+```bash
+# List models
+curl http://localhost:8000/v1/models
+
+# Create a chat completion
+curl -X POST \
+  http://localhost:8000/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "model": "eko-mistral",
+    "messages": [
+      {"role": "system", "content": "You are a helpful AI assistant."},
+      {"role": "user", "content": "What is climate change?"}
+    ]
+  }'
+```
+
+#### Using with OpenAI Python Client
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8000/v1/",  # Replace with your RunPod URL
+    api_key="not-needed"  # API key is not checked but required by the client
+)
+
+response = client.chat.completions.create(
+    model="eko-mistral",
+    messages=[
+        {"role": "system", "content": "You are a helpful AI assistant."},
+        {"role": "user", "content": "What is climate change?"}
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
 ## Local Testing
 
 To test locally:
@@ -60,11 +104,19 @@ To test locally:
 ```bash
 # Build with your HF token
 docker build --build-arg HF_TOKEN=your_huggingface_token -t eko-mistral-runpod:local .
-docker run -p 8000:8000 eko-mistral-runpod:local
+docker run -p 8000:8000 -p 8080:8080 eko-mistral-runpod:local
 ```
 
-Then send requests to `http://localhost:8000/run` or use the test script:
+Then send requests to:
+
+### Test Standard RunPod API
 
 ```bash
-python test.py --url http://localhost:8000/run --prompt "What is climate change?"
+python test.py --url http://localhost:8080/run --prompt "What is climate change?"
+```
+
+### Test OpenAI-Compatible API
+
+```bash
+python test_openai.py --url http://localhost:8000 --prompt "What is climate change?"
 ```

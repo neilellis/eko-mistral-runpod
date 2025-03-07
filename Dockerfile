@@ -4,8 +4,9 @@ FROM runpod/base:0.4.0-cuda11.8.0
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip && \
-    pip install runpod huggingface_hub requests
+    pip install -r /tmp/requirements.txt
 
 # Set model constants
 ENV MODEL_REPO="neileko/eko-mistral-small" \
@@ -30,6 +31,7 @@ RUN mkdir -p /root/.ollama && \
 # Copy the handler code
 WORKDIR /app
 COPY src/handler.py /app/handler.py
+COPY src/openai_api.py /app/openai_api.py
 
 # Set the entrypoint
 CMD ["python", "-u", "handler.py"]
