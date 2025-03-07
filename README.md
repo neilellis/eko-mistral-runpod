@@ -19,10 +19,15 @@ This project sets up a RunPod serverless endpoint that:
 
 ### Building the Container
 
+You'll need a Hugging Face token to download the model. You can generate one at https://huggingface.co/settings/tokens.
+
 ```bash
-docker build -t your-dockerhub-username/eko-mistral-runpod:latest .
+# Build with HF_TOKEN as a build argument
+docker build --build-arg HF_TOKEN=your_huggingface_token -t your-dockerhub-username/eko-mistral-runpod:latest .
 docker push your-dockerhub-username/eko-mistral-runpod:latest
 ```
+
+> **Important**: Never commit your Hugging Face token to version control. When building in CI/CD environments, use secrets management.
 
 ### Deploying to RunPod
 
@@ -53,8 +58,13 @@ curl -X POST \
 To test locally:
 
 ```bash
-docker build -t eko-mistral-runpod:local .
+# Build with your HF token
+docker build --build-arg HF_TOKEN=your_huggingface_token -t eko-mistral-runpod:local .
 docker run -p 8000:8000 eko-mistral-runpod:local
 ```
 
-Then send requests to `http://localhost:8000/run`.
+Then send requests to `http://localhost:8000/run` or use the test script:
+
+```bash
+python test.py --url http://localhost:8000/run --prompt "What is climate change?"
+```

@@ -11,10 +11,14 @@ RUN pip install --upgrade pip && \
 ENV MODEL_REPO="neileko/eko-mistral-small" \
     MODEL_PATH="/workspace/model"
 
-# Download the model during build time
+# ARG for HuggingFace token (to be passed at build time)
+ARG HF_TOKEN
+
+# Download the model during build time using token
 RUN mkdir -p ${MODEL_PATH} && \
     python -c "from huggingface_hub import snapshot_download; \
-    snapshot_download(repo_id='${MODEL_REPO}', local_dir='${MODEL_PATH}', local_dir_use_symlinks=False)"
+    snapshot_download(repo_id='${MODEL_REPO}', local_dir='${MODEL_PATH}', \
+    local_dir_use_symlinks=False, token='${HF_TOKEN}')"
 
 # Setup Ollama with the model
 RUN mkdir -p /root/.ollama && \
